@@ -5,7 +5,7 @@ import re
 import id_info
 import voice_info
 
-path = "voice"
+path = r"voice"
 dir_voice = os.listdir(path)
 all_char_info = []
 for dir_char in dir_voice:
