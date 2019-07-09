@@ -1,20 +1,28 @@
-
 import os
 import re
 
 import id_info
 import voice_info
 
-path = r"G:\tmp\export\AudioClip\assets\torappu\dynamicassets\audio\sound_beta_2\voice"
+log = ''
+
+path = r"voice"
 dir_voice = os.listdir(path)
 all_char_info = []
 for dir_char in dir_voice:
     who = re.findall(r'char_(\d+)', dir_char)
 
     if len(who) > 0:
-        who_cn = id_info.id_info[who[0]][1]
+        try:
+            who_cn = id_info.id_info[who[0]][1]
+        except KeyError as e:
+            log += "key " + who[0] + " not found\n"
+            continue
         new_dir_char = os.path.join(path, "out", who_cn)
-        os.makedirs(new_dir_char)
+        try:
+            os.makedirs(new_dir_char)
+        except FileExistsError:
+            log += "skip exist " + new_dir_char + "\n"
         list_voice = os.listdir(path + '\\' + dir_char)
         for one_voice in list_voice:
             c_id = re.findall(r'CN_(\d+)', one_voice)
@@ -22,9 +30,11 @@ for dir_char in dir_voice:
             newname = who_cn + "_" + c_name + ".wav"
 
             try:
-                os.rename(os.path.join(path, dir_char, one_voice), os.path.join(path, "out",new_dir_char, newname))
+                os.rename(os.path.join(path, dir_char, one_voice), os.path.join(path, "out", new_dir_char, newname))
             except FileExistsError:
                 newname = newname.rstrip('.wav')
-                newname +="_2.wav";
-                os.rename(os.path.join(path, dir_char, one_voice), os.path.join(path, "out", new_dir_char,newname))
+                newname += "_2.wav";
+                os.rename(os.path.join(path, dir_char, one_voice), os.path.join(path, "out", new_dir_char, newname))
             print(newname + " is ok")
+
+print(log)
